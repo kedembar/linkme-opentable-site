@@ -394,6 +394,9 @@ function StatusBar({ dark = false }: { dark?: boolean }) {
 
 function BookingFlowDemo() {
   const [step, setStep] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { margin: "-100px", amount: 0.3 });
+  const [viewKey, setViewKey] = useState(0);
   const steps = [
     { label: "Instagram Bio", sublabel: "Guest taps link.me/mila" },
     { label: "Linkme Profile", sublabel: "Taps Reserve Dinner" },
@@ -401,12 +404,21 @@ function BookingFlowDemo() {
     { label: "Confirmed", sublabel: "Seated cover earned" },
   ];
 
+  /* Reset to beginning each time the section scrolls into view */
   useEffect(() => {
+    if (isInView) {
+      setStep(0);
+      setViewKey((k) => k + 1);
+    }
+  }, [isInView]);
+
+  useEffect(() => {
+    if (!isInView) return;
     const timer = setInterval(() => {
       setStep((prev) => (prev + 1) % steps.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isInView, viewKey]);
 
   /* Reusable photo-like gradient blocks that simulate real restaurant imagery */
   const photoGrads = [
@@ -792,7 +804,7 @@ function BookingFlowDemo() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+    <div ref={containerRef} className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
       {/* Step indicators */}
       <div className="flex-1 space-y-3 order-2 lg:order-1">
         {steps.map((s, i) => (
@@ -875,6 +887,8 @@ function BookingFlowDemo() {
 function CommentBookDemo() {
   const [phase, setPhase] = useState(0);
   const [loopKey, setLoopKey] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { margin: "-100px", amount: 0.3 });
 
   /* phase timeline:
      0 = post visible, no comments yet
@@ -888,7 +902,16 @@ function CommentBookDemo() {
      8 = pause, then reset
   */
 
+  /* Reset to beginning each time the section scrolls into view */
   useEffect(() => {
+    if (isInView) {
+      setPhase(0);
+      setLoopKey((k) => k + 1);
+    }
+  }, [isInView]);
+
+  useEffect(() => {
+    if (!isInView) return;
     const delays = [1200, 1400, 1200, 900, 1200, 600, 1800, 2500, 0];
     let timeout: NodeJS.Timeout;
     if (phase < 8) {
@@ -900,7 +923,7 @@ function CommentBookDemo() {
       }, 2800);
     }
     return () => clearTimeout(timeout);
-  }, [phase, loopKey]);
+  }, [phase, loopKey, isInView]);
 
   const comments = [
     { user: "foodie.sarah", avatar: "#E91E63", text: "This looks incredible", delay: 0 },
@@ -909,7 +932,7 @@ function CommentBookDemo() {
   ];
 
   return (
-    <div key={loopKey} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+    <div ref={containerRef} key={loopKey} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
       {/* ── LEFT: Simulated Instagram Post ── */}
       <div className="glass rounded-[20px] overflow-hidden border border-black/[0.06]">
