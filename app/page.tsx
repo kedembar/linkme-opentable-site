@@ -168,11 +168,11 @@ function Nav() {
         transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
         className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-4 bg-[rgba(250,250,250,0.8)] backdrop-blur-[30px] border-b border-black/[0.06] flex items-center justify-between"
       >
-        <div className="flex items-center gap-3">
+        <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="flex items-center gap-3 cursor-pointer">
           <LinkmeLogomark className="h-6 opacity-90" />
           <span className="text-[#DC2626] text-lg font-light">&times;</span>
           <OpenTableLogo className="h-5 opacity-90" />
-        </div>
+        </a>
         <div className="hidden md:flex gap-7">
           {links.map((l, i) => (
             <motion.a
