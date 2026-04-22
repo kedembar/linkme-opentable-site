@@ -395,8 +395,8 @@ function StatusBar({ dark = false }: { dark?: boolean }) {
 function BookingFlowDemo() {
   const [step, setStep] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { margin: "-100px", amount: 0.3 });
-  const [viewKey, setViewKey] = useState(0);
+  const isInView = useInView(containerRef, { margin: "-100px" });
+  const wasInView = useRef(false);
   const steps = [
     { label: "Instagram Bio", sublabel: "Guest taps link.me/mila" },
     { label: "Linkme Profile", sublabel: "Taps Reserve Dinner" },
@@ -404,12 +404,12 @@ function BookingFlowDemo() {
     { label: "Confirmed", sublabel: "Seated cover earned" },
   ];
 
-  /* Reset to beginning each time the section scrolls into view */
+  /* Reset to step 0 each time the section re-enters the viewport */
   useEffect(() => {
-    if (isInView) {
+    if (isInView && !wasInView.current) {
       setStep(0);
-      setViewKey((k) => k + 1);
     }
+    wasInView.current = isInView;
   }, [isInView]);
 
   useEffect(() => {
@@ -418,7 +418,7 @@ function BookingFlowDemo() {
       setStep((prev) => (prev + 1) % steps.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [isInView, viewKey]);
+  }, [isInView]);
 
   /* Reusable photo-like gradient blocks that simulate real restaurant imagery */
   const photoGrads = [
@@ -888,7 +888,8 @@ function CommentBookDemo() {
   const [phase, setPhase] = useState(0);
   const [loopKey, setLoopKey] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { margin: "-100px", amount: 0.3 });
+  const isInView = useInView(containerRef, { margin: "-100px" });
+  const wasInView = useRef(false);
 
   /* phase timeline:
      0 = post visible, no comments yet
@@ -902,12 +903,13 @@ function CommentBookDemo() {
      8 = pause, then reset
   */
 
-  /* Reset to beginning each time the section scrolls into view */
+  /* Reset to beginning each time the section re-enters the viewport */
   useEffect(() => {
-    if (isInView) {
+    if (isInView && !wasInView.current) {
       setPhase(0);
       setLoopKey((k) => k + 1);
     }
+    wasInView.current = isInView;
   }, [isInView]);
 
   useEffect(() => {
@@ -932,7 +934,8 @@ function CommentBookDemo() {
   ];
 
   return (
-    <div ref={containerRef} key={loopKey} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+    <div ref={containerRef}>
+    <div key={loopKey} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
       {/* ── LEFT: Simulated Instagram Post ── */}
       <div className="glass rounded-[20px] overflow-hidden border border-black/[0.06]">
@@ -1311,6 +1314,7 @@ function CommentBookDemo() {
           )}
         </AnimatePresence>
       </div>
+    </div>
     </div>
   );
 }
@@ -1980,7 +1984,7 @@ export default function Home() {
           <Reveal delay={0.3}>
             <MagneticWrap>
               <p className="text-[24px] font-bold shimmer">
-                OpenTable&rsquo;s downside is zero. Their upside is a new revenue stream plus social media attribution data across 70,000 restaurants.
+                OpenTable&rsquo;s downside is zero. Your upside is a new revenue stream plus social media attribution data across 70,000 restaurants.
               </p>
             </MagneticWrap>
           </Reveal>
